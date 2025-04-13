@@ -1,8 +1,5 @@
 <!doctype html>
-<!-- request form. The top area contains a 'what's new' banner image which is obtained from a URL. The image is 1000px wide and 200px high. The image is centered on the page.
-    The next part contains a title 'Component Request Form' in a large font.
-    The next part contains 10 rows, each with a component type drop-down, and a text field for entering the component value, and a field for notes, and a drop-down for quantity (1-10).
-    there will also be a submit button for submitting the request as an email to the admin. -->
+<!-- component request form -->
 <html lang="en">
 
 <head>
@@ -106,11 +103,11 @@
 <body>
     <div class="container">
         <div class="banner">
-            <img src="https://drcviulsgpuhqxyz5oesf2zftq0brmqc.lambda-url.eu-west-1.on.aws/" alt="What's New Banner">
+            <!-- placeholder until image loads -->
+            <canvas id="bannerCanvas" width="1000" height="200"></canvas>
         </div>
         <h1>Prototypes and Repairs, Fast!</h1>
         <form id="requestForm">
-            <!-- name, contact details fields. the location field is not mandatory -->
             <div class="form-row">
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required>
@@ -181,6 +178,19 @@
             if (loadingMessage) {
                 loadingMessage.remove();
             }
+            // asynchronously add the banner image
+            const banner = document.querySelector('.banner');
+            const img = document.createElement('img');
+            img.src = 'https://drcviulsgpuhqxyz5oesf2zftq0brmqc.lambda-url.eu-west-1.on.aws/';
+            img.alt = "What's New Banner";
+            img.onload = () => {
+                // remove the canvas
+                const canvas = document.getElementById('bannerCanvas');
+                if (canvas) {
+                    canvas.remove();
+                }
+                banner.appendChild(img);
+            };
         }
         
         function doneReturnButton() {
@@ -188,9 +198,6 @@
             // hide the success message
             document.getElementById('successMessage').classList.add('hidden');
             form.reset();
-            // const componentRows = document.getElementById('componentRows');
-            // componentRows.innerHTML = '';
-            // addComponentRows();
             // hide the reset button and show the submit button
             document.getElementById('resetButton').classList.add('hidden');
             document.querySelector('.submit-button').classList.remove('hidden');
@@ -198,7 +205,6 @@
 
         function submitForm() {
             const form = document.getElementById('requestForm');
-            // send the form data to an AWS lambda function
             const formData = new FormData(form);
             const requestData = {};
             formData.forEach((value, key) => {
@@ -232,5 +238,4 @@
     </script>
 </body>
 </html>
-
 
