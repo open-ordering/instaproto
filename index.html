@@ -204,6 +204,13 @@
         }
 
         function submitForm() {
+            // gray out the Submit button and show a Please Wait message
+            const submitButton = document.querySelector('.submit-button');
+            submitButton.classList.add('hidden');
+            const loadingMessage = document.createElement('div');
+            loadingMessage.innerHTML = '<p>Please wait...</p>';
+            document.querySelector('.container').appendChild(loadingMessage);
+            // form handling
             const form = document.getElementById('requestForm');
             const formData = new FormData(form);
             const requestData = {};
@@ -219,18 +226,31 @@
             })
             .then(response => {
                 if (response.ok) {
+                    // remove the please wait message
+                    loadingMessage.remove();
+                    // show the success message
                     document.getElementById('successMessage').classList.remove('hidden');
                     // hide the Submit button and show the reset button
                     document.querySelector('.submit-button').classList.add('hidden');
                     document.getElementById('resetButton').classList.remove('hidden');
                     // form.reset();
                 } else {
+                    // remove the please wait message
+                    loadingMessage.remove();
                     alert('There was an error submitting your request. Please try again.');
+                    // show the Submit button and hide the reset button
+                    document.querySelector('.submit-button').classList.remove('hidden');
+                    document.getElementById('resetButton').classList.add('hidden');
                 }
             })
             .catch(error => {
+                // remove the please wait message
+                loadingMessage.remove();
                 console.error('Error:', error);
                 alert('There was an error submitting your request. Please try again.');
+                // show the Submit button and hide the reset button
+                document.querySelector('.submit-button').classList.remove('hidden');
+                document.getElementById('resetButton').classList.add('hidden');
             });
             
         }
