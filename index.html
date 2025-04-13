@@ -1,0 +1,236 @@
+<!doctype html>
+<!-- request form. The top area contains a 'what's new' banner image which is obtained from a URL. The image is 1000px wide and 200px high. The image is centered on the page.
+    The next part contains a title 'Component Request Form' in a large font.
+    The next part contains 10 rows, each with a component type drop-down, and a text field for entering the component value, and a field for notes, and a drop-down for quantity (1-10).
+    there will also be a submit button for submitting the request as an email to the admin. -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Request Form</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .banner {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .banner img {
+            width: 100%;
+            height: auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .submit-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+        }
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+        .success {
+            color: green;
+            font-size: 1.2em;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .form-row {
+            margin-bottom: 10px;
+        }
+        .form-row label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-row input,
+        .form-row select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .form-row textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="banner">
+            <img src="https://drcviulsgpuhqxyz5oesf2zftq0brmqc.lambda-url.eu-west-1.on.aws/" alt="What's New Banner">
+        </div>
+        <h1>Prototypes and Repairs, Fast!</h1>
+        <form id="requestForm">
+            <!-- name, contact details fields. the location field is not mandatory -->
+            <div class="form-row">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-row">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-row">
+                <label for="phone">Phone:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-row">
+                <label for="location">Location (e.g. Building, Floor, Room):</label>
+                <input type="text" id="location" name="location">
+            </div>
+            <!-- some instructions here to help the user -->
+            <p>Please fill out the form as best as possible; you'll be contacted for confirmation and for any desired alternatives if your preferences are not available.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component Type</th>
+                        <th>Component Value</th>
+                        <th>Notes</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody id="componentRows">
+                    <!-- Rows will be added here dynamically -->
+                </tbody>
+            </table>
+            <div id="successMessage" class="success hidden">Your request has been submitted successfully!</div>
+            <button type="button" class="submit-button" onclick="submitForm()">Submit Request</button>
+            <!-- a hidden button for returning to a clean form -->
+            <button type="button" class="submit-button hidden" id="resetButton" onclick="doneReturnButton()""; document.getElementById('successMessage').classList.add('hidden');">Done, Return to Request Form</button>
+        </form>
+        
+    </div>
+
+    <script>
+        const componentTypes = ['Passive (Res/Cap/Ind/Xtal)', 'Semiconductors (Discrete)', 'Integrated Circuit', 'Opto', 'Connectors/Terminals', 'Sensors/Transducers/Speakers', 'Switches/Mechanical', 'Prototyping Hardware', 'Electrical/Fuses', 'Other'];
+        const maxRows = 10;
+
+        function createRow(index) {
+            return `
+                <tr class="form-row">
+                    <td>
+                        <select name="componentType${index}" required>
+                            ${componentTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                        </select>
+                    </td>
+                    <td><input type="text" name="componentValue${index}" ></td>
+                    <td><textarea name="notes${index}" rows="2"></textarea></td>
+                    <td><input type="number" name="quantity${index}" min="1" max="10" value="1" ></td>
+                </tr>`;
+        }
+        function addComponentRows() {
+            // display a 'please wait' message while the rows are being added
+            const form = document.getElementById('requestForm');
+            const loadingMessage = document.createElement('div');
+            loadingMessage.innerHTML = '<p>Please wait...</p>';
+
+            const componentRows = document.getElementById('componentRows');
+            for (let i = 0; i < maxRows; i++) {
+                componentRows.innerHTML += createRow(i);
+            }
+            // remove the loading message
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+        }
+        
+        function doneReturnButton() {
+            const form = document.getElementById('requestForm');
+            // hide the success message
+            document.getElementById('successMessage').classList.add('hidden');
+            form.reset();
+            // const componentRows = document.getElementById('componentRows');
+            // componentRows.innerHTML = '';
+            // addComponentRows();
+            // hide the reset button and show the submit button
+            document.getElementById('resetButton').classList.add('hidden');
+            document.querySelector('.submit-button').classList.remove('hidden');
+        }
+
+        function submitForm() {
+            const form = document.getElementById('requestForm');
+            // send the form data to an AWS lambda function
+            const formData = new FormData(form);
+            const requestData = {};
+            formData.forEach((value, key) => {
+                requestData[key] = value;
+            });
+            fetch('https://rryqsywqfrbj426z3ltyh76vjm0rmemt.lambda-url.eu-west-1.on.aws/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('successMessage').classList.remove('hidden');
+                    // hide the Submit button and show the reset button
+                    document.querySelector('.submit-button').classList.add('hidden');
+                    document.getElementById('resetButton').classList.remove('hidden');
+                    // form.reset();
+                } else {
+                    alert('There was an error submitting your request. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your request. Please try again.');
+            });
+            
+        }
+        window.onload = addComponentRows;
+    </script>
+</body>
+</html>
+
+
